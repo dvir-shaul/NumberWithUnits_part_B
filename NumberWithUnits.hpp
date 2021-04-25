@@ -8,9 +8,10 @@
 namespace ariel{
     class NumberWithUnits{          
             
-
+        
         public:
-             
+            static inline std::unordered_map<std::string,std::unordered_map<std::string ,double>> my_map;
+
             NumberWithUnits(const double amount,const std::string &Of_What);
             ~NumberWithUnits(){}
 
@@ -18,12 +19,20 @@ namespace ariel{
             std::string Of_What;
             
             friend NumberWithUnits operator+(const NumberWithUnits & a,const NumberWithUnits & b) ;
-            friend NumberWithUnits operator+=(NumberWithUnits  & a,const NumberWithUnits & b);
+
+            NumberWithUnits operator+=(const NumberWithUnits & b){
+                *this = *this + b;
+                return *this;
+            }
+            
             friend NumberWithUnits operator+(const NumberWithUnits & a);
 
 
             friend NumberWithUnits operator-(const NumberWithUnits & a,const NumberWithUnits & b) ;
-            friend NumberWithUnits operator-=(NumberWithUnits  & a,const NumberWithUnits & b);
+            NumberWithUnits operator-=(const NumberWithUnits & b){
+                *this = *this - b;
+                return *this;
+            }
             friend NumberWithUnits operator-(const NumberWithUnits & a);
 
 
@@ -39,7 +48,8 @@ namespace ariel{
 
             friend std::istream& operator>>(std::istream& istream, NumberWithUnits& a);
             friend std::ostream& operator<<(std::ostream& ostream, const NumberWithUnits& a);
-                    
+
+            bool check( NumberWithUnits const & a, NumberWithUnits const & b );      
                     
             friend bool operator<(const NumberWithUnits& first, const NumberWithUnits& second) ;
             friend bool operator>(const NumberWithUnits& first, const NumberWithUnits& secondd) ;

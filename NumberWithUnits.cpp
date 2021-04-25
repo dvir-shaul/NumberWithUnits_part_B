@@ -11,10 +11,9 @@ const double  epsilon =  0.0001;
 
 namespace ariel{
 
-    std::unordered_map<std::string,std::unordered_map<std::string ,double>> my_map;
 
    NumberWithUnits::NumberWithUnits(const double amount,const string &Of_What){
-        if (my_map.count(Of_What)==0|| Of_What.empty()){
+        if (NumberWithUnits::my_map.count(Of_What)==0|| Of_What.empty()){
           throw runtime_error("wrong unit type");
         }
         this->amount=amount;
@@ -36,7 +35,7 @@ namespace ariel{
         else{
             istream >> b2;
         }
-        if (my_map.find(_new_str) == my_map.end())
+        if (NumberWithUnits::my_map.find(_new_str) == NumberWithUnits::my_map.end())
         {
             throw invalid_argument("Wrong input, can't build new NumberWithUnits");
         }
@@ -53,10 +52,10 @@ namespace ariel{
 
 
   bool check( NumberWithUnits const & a, NumberWithUnits const & b ) {
-    if((a.Of_What==b.Of_What) && my_map.find(a.Of_What) != my_map.end()) {
+    if((a.Of_What==b.Of_What) && NumberWithUnits::my_map.find(a.Of_What) != NumberWithUnits::my_map.end()) {
         return false;
         }
-    if ( my_map.find(a.Of_What) != my_map.end() &&  (my_map[a.Of_What].find(b.Of_What) != my_map[a.Of_What].end())) {
+    if ( NumberWithUnits::my_map.find(a.Of_What) != NumberWithUnits::my_map.end() &&  (NumberWithUnits::my_map[a.Of_What].find(b.Of_What) != NumberWithUnits::my_map[a.Of_What].end())) {
                     return false;
             }
     return true;
@@ -66,22 +65,22 @@ namespace ariel{
      double converter(const string& a, const string& b,double val ){
         if(a == b) {return val;}
         try {
-            return val * my_map[b][a];
+            return val * NumberWithUnits::my_map[b][a];
         }
         catch(const exception& e) {
             throw invalid_argument{"Units do not match - ["+a+"] cannot be converted to ["+b+"]"};
         }
     }
   void casting(const string &str1 ,const string &str2){
-       for (auto& p : my_map[str1]){
-            double cast = my_map[str2][str1] * p.second;
-            my_map[str2][p.first] = cast;
-            my_map[p.first][str2]= 1/cast;
+       for (auto& p : NumberWithUnits::my_map[str1]){
+            double cast = NumberWithUnits::my_map[str2][str1] * p.second;
+            NumberWithUnits::my_map[str2][p.first] = cast;
+            NumberWithUnits::my_map[p.first][str2]= 1/cast;
             }
-        for (auto& p : my_map[str2]){
-            double cast = my_map[str1][str2] * p.second;
-            my_map[str1][p.first] = cast;
-            my_map[p.first][str1]= 1/cast;
+        for (auto& p : NumberWithUnits::my_map[str2]){
+            double cast = NumberWithUnits::my_map[str1][str2] * p.second;
+            NumberWithUnits::my_map[str1][p.first] = cast;
+            NumberWithUnits::my_map[p.first][str1]= 1/cast;
             }    
   }
 
@@ -97,8 +96,8 @@ namespace ariel{
         1 m = 100 cm
         */
         while(files >> v1 >> str1 >> equal_sign >> v2 >> str2){
-            my_map[str1][str2] = v2;
-            my_map[str2][str1] = 1/v2;
+            NumberWithUnits::my_map[str1][str2] = v2;
+            NumberWithUnits::my_map[str2][str1] = 1/v2;
             casting(str1,str2);
         }
     }
@@ -114,12 +113,6 @@ namespace ariel{
     NumberWithUnits operator+(const NumberWithUnits  & a) {
         return NumberWithUnits(+a.amount,a.Of_What);
     }
-    NumberWithUnits operator+=(NumberWithUnits  & a,const NumberWithUnits & b){
-        if(check(a,b)) {  __throw_invalid_argument("Eror not same type");}
-        //double converted = converter(a.Of_What, b.Of_What, b.amount);
-        a = a+b;
-        return a;
-    }
 
 
     // ********* minus ********
@@ -132,18 +125,6 @@ namespace ariel{
         double converted = converter(a.Of_What, b.Of_What, b.amount);
         return NumberWithUnits(a.amount-converted, a.Of_What);;
     }
-
-    NumberWithUnits operator-=(NumberWithUnits  & a,const NumberWithUnits & b){
-        if(check(a,b)) {  __throw_invalid_argument("Eror not same type");}
-        //double converted = converter(a.Of_What, b.Of_What, b.amount);
-         a = a-b;
-        return a;
-    }
-
-
-
-
-
   //     ************ ++     -- ************************
 
      //value--
@@ -193,7 +174,7 @@ namespace ariel{
         if( first.Of_What == second.Of_What){
             return first.amount < second.amount;
         }
-        double converted = my_map[first.Of_What][second.Of_What];
+        double converted = NumberWithUnits::my_map[first.Of_What][second.Of_What];
         double n = first.amount * converted;
         return (n < second.amount);
     }
